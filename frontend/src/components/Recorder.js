@@ -27,7 +27,7 @@ const Recorder = ({ setAnalytics, stopSignal }) => {
       .padStart(2, "0")}`;
   };
 
-  // ---------- START CAMERA + AUDIO ----------
+  // ---------------- START CAMERA + AUDIO ----------------
 
   const startMedia = async () => {
     try {
@@ -59,12 +59,15 @@ const Recorder = ({ setAnalytics, stopSignal }) => {
     }
   };
 
-  // ---------- STOP CAMERA ----------
+  // ---------------- STOP CAMERA ----------------
 
   const stopMedia = () => {
 
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+      });
+
       streamRef.current = null;
     }
 
@@ -73,7 +76,7 @@ const Recorder = ({ setAnalytics, stopSignal }) => {
     }
   };
 
-  // ---------- START RECORDING ----------
+  // ---------------- START RECORDING ----------------
 
   const startRecording = async () => {
 
@@ -121,7 +124,7 @@ const Recorder = ({ setAnalytics, stopSignal }) => {
     }, 1000);
   };
 
-  // ---------- STOP RECORDING ----------
+  // ---------------- STOP RECORDING ----------------
 
   const stopRecording = () => {
 
@@ -131,11 +134,12 @@ const Recorder = ({ setAnalytics, stopSignal }) => {
     clearInterval(intervalRef.current);
     clearInterval(timerRef.current);
 
-    stopMedia();
-
     const recorder = mediaRecorderRef.current;
 
-    if (!recorder) return;
+    if (!recorder) {
+      stopMedia();
+      return;
+    }
 
     recorder.onstop = async () => {
 
@@ -150,21 +154,21 @@ const Recorder = ({ setAnalytics, stopSignal }) => {
 
         console.log("Sending audio for speech analysis");
 
-const speechResponse = await axios.post(
-  `${API_URL}/analyze-audio`,
-  formData
-);
+        const speechResponse = await axios.post(
+          `${API_URL}/analyze-audio`,
+          formData
+        );
 
-console.log("Speech result:", speechResponse.data);
+        console.log("Speech result:", speechResponse.data);
 
-console.log("Sending emotions:", sessionEmotionsRef.current);
+        console.log("Sending emotions:", sessionEmotionsRef.current);
 
-const emotionResponse = await axios.post(
-  `${API_URL}/aggregate-emotions`,
-  sessionEmotionsRef.current
-);
+        const emotionResponse = await axios.post(
+          `${API_URL}/aggregate-emotions`,
+          sessionEmotionsRef.current
+        );
 
-console.log("Emotion result:", emotionResponse.data);
+        console.log("Emotion result:", emotionResponse.data);
 
         const finalAnalytics = {
           ...emotionResponse.data,
@@ -176,6 +180,9 @@ console.log("Emotion result:", emotionResponse.data);
       } catch (error) {
         console.error("Final analysis error:", error);
       }
+
+      // 🔴 CAMERA + MIC FINALLY STOP HERE
+      stopMedia();
     };
 
     if (recorder.state !== "inactive") {
@@ -183,13 +190,13 @@ console.log("Emotion result:", emotionResponse.data);
     }
   };
 
-  // ---------- AUTO START ----------
+  // ---------------- AUTO START ----------------
 
   useEffect(() => {
     startRecording();
   }, []);
 
-  // ---------- STOP WHEN SUBMITTED ----------
+  // ---------------- STOP WHEN SUBMITTED ----------------
 
   useEffect(() => {
     if (stopSignal === true) {
@@ -198,7 +205,7 @@ console.log("Emotion result:", emotionResponse.data);
     }
   }, [stopSignal]);
 
-  // ---------- CLEANUP WHEN COMPONENT UNMOUNTS ----------
+  // ---------------- CLEANUP ----------------
 
   useEffect(() => {
     return () => {
@@ -234,6 +241,8 @@ console.log("Emotion result:", emotionResponse.data);
           }}
         />
 
+        {/* Recording indicator */}
+
         <div
           style={{
             position: "absolute",
@@ -258,6 +267,8 @@ console.log("Emotion result:", emotionResponse.data);
           />
           <span style={{ color: "#f87171" }}>Recording</span>
         </div>
+
+        {/* Timer */}
 
         <div
           style={{

@@ -15,7 +15,9 @@ export default function InterviewScreen({ finishInterview }) {
 
   const progress = ((index + 1) / questions.length) * 100;
 
-  // Timer
+  // -----------------------------
+  // TIMER
+  // -----------------------------
 
   useEffect(() => {
 
@@ -30,21 +32,32 @@ export default function InterviewScreen({ finishInterview }) {
 
     return () => clearTimeout(timer);
 
-  }, [timeLeft]);
+  }, [timeLeft, index]);
 
-  // Next Question
+
+  // -----------------------------
+  // WAIT FOR ANALYTICS RESULT
+  // -----------------------------
+
+  useEffect(() => {
+
+    if (stopSignal && analytics) {
+      finishInterview(analytics);
+    }
+
+  }, [analytics]);
+
+
+  // -----------------------------
+  // NEXT QUESTION
+  // -----------------------------
 
   const nextQuestion = () => {
 
     if (lastQuestion) {
 
-      // STOP CAMERA + MIC
+      // Stop recording
       setStopSignal(true);
-
-      // Go to result page after small delay
-      setTimeout(() => {
-        finishInterview(analytics);
-      }, 1500);
 
     } else {
 
@@ -54,6 +67,11 @@ export default function InterviewScreen({ finishInterview }) {
     }
 
   };
+
+
+  // -----------------------------
+  // FORMAT TIMER
+  // -----------------------------
 
   const formatTime = (seconds) => {
 
@@ -65,6 +83,11 @@ export default function InterviewScreen({ finishInterview }) {
       .padStart(2, "0")}`;
 
   };
+
+
+  // -----------------------------
+  // UI
+  // -----------------------------
 
   return (
 
@@ -89,7 +112,7 @@ export default function InterviewScreen({ finishInterview }) {
         }}
       >
 
-        {/* Progress */}
+        {/* Progress Bar */}
 
         <div
           style={{
@@ -109,6 +132,7 @@ export default function InterviewScreen({ finishInterview }) {
           />
 
         </div>
+
 
         {/* Question Header */}
 
@@ -131,6 +155,7 @@ export default function InterviewScreen({ finishInterview }) {
 
         </div>
 
+
         {/* Question */}
 
         <h2
@@ -143,12 +168,14 @@ export default function InterviewScreen({ finishInterview }) {
           {questions[index]}
         </h2>
 
+
         {/* Recorder */}
 
         <Recorder
           setAnalytics={setAnalytics}
           stopSignal={stopSignal}
         />
+
 
         {/* Button */}
 
@@ -180,5 +207,6 @@ export default function InterviewScreen({ finishInterview }) {
       </div>
 
     </div>
+
   );
 }

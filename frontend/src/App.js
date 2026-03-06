@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 import HomeScreen from "./components/HomeScreen";
 import InterviewScreen from "./components/InterviewScreen";
@@ -8,32 +8,51 @@ import Dashboard from "./components/Dashboard";
 function App() {
 
   const [screen, setScreen] = useState("home");
-  const [results, setResults] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
 
-  if (screen === "home")
-    return <HomeScreen startInterview={() => setScreen("interview")} />;
+  // called when interview finishes
+  const finishInterview = (data) => {
 
-  if (screen === "interview")
-    return (
-      <InterviewScreen
-        finishInterview={(data) => {
-          setResults(data);
-          setScreen("processing");
-        }}
-      />
-    );
+    console.log("Interview finished with analytics:", data);
 
-  if (screen === "processing")
-    return (
-      <ProcessingScreen
-        done={() => setScreen("results")}
-      />
-    );
+    setAnalytics(data);
+    setScreen("dashboard");
 
-  if (screen === "results")
-    return <Dashboard analytics={results} />;
+  };
 
-  return null;
+  return (
+    <div style={{ minHeight: "100vh" }}>
+
+      {/* HOME */}
+      {screen === "home" && (
+        <HomeScreen setScreen={setScreen} />
+      )}
+
+      {/* INTERVIEW */}
+      {screen === "interview" && (
+        <InterviewScreen
+          finishInterview={finishInterview}
+        />
+      )}
+
+      {/* PROCESSING */}
+      {screen === "processing" && (
+        <ProcessingScreen
+          analytics={analytics}
+          setScreen={setScreen}
+        />
+      )}
+
+      {/* DASHBOARD */}
+      {screen === "dashboard" && (
+        <Dashboard
+          analytics={analytics}
+          setScreen={setScreen}
+        />
+      )}
+
+    </div>
+  );
 }
 
 export default App;

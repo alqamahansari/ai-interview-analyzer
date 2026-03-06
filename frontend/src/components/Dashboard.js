@@ -4,35 +4,43 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+
+/* Improved Card Component */
+
 const Card = ({ title, children }) => (
   <div
     style={{
-      background: "#F3F4F6",
-      border: "1px solid #D1D5DB",
+      background: "#F9FAFB",
+      border: "1px solid #E5E7EB",
       borderRadius: "10px",
-      padding: "20px",
-      height: "100%"
+      padding: "16px",
+      color: "#374151",
+      height: "100%",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+      transition: "all 0.2s ease"
     }}
   >
-    <h3
+    <div
       style={{
-        marginBottom: "15px",
         fontSize: "16px",
-        color: "#111827"
+        fontWeight: "600",
+        color: "#111827",
+        marginBottom: "12px",
+        paddingBottom: "6px",
+        borderBottom: "1px solid #E5E7EB"
       }}
     >
       {title}
-    </h3>
+    </div>
 
     {children}
   </div>
 );
 
+
 export default function Dashboard({ analytics }) {
 
-  if (!analytics) {
-    return <p>Loading results...</p>;
-  }
+  if (!analytics) return <p>Loading...</p>;
 
   const { distribution, confidence_score, speech } = analytics;
 
@@ -59,9 +67,9 @@ export default function Dashboard({ analytics }) {
   return (
     <div
       style={{
-        maxWidth: "1000px",
+        maxWidth: "1400px",
         margin: "auto",
-        padding: "40px",
+        padding: "20px",
         fontFamily: "Inter, system-ui"
       }}
     >
@@ -71,50 +79,52 @@ export default function Dashboard({ analytics }) {
       <h1
         style={{
           textAlign: "center",
-          marginBottom: "35px",
-          color: "#111827"
+          marginBottom: "18px",
+          color: "#111827",
+          fontSize: "30px"
         }}
       >
         Interview Analysis Report
       </h1>
 
-      {/* Confidence Score */}
 
-      <Card title="Confidence Score">
-
-        <div
-          style={{
-            fontSize: "40px",
-            fontWeight: "600",
-            textAlign: "center",
-            color: "#2563EB"
-          }}
-        >
-          {confidence_score}%
-        </div>
-
-      </Card>
-
-      {/* Middle Grid */}
+      {/* GRID */}
 
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: "20px",
-          marginTop: "20px"
+          gap: "16px"
         }}
       >
 
-        {/* Emotion Chart */}
+        {/* Confidence */}
 
-        <Card title="Emotion Distribution">
+        <Card title="Confidence Score">
 
-          <Pie data={data} />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "110px"
+            }}
+          >
+            <div
+              style={{
+                fontSize: "44px",
+                fontWeight: "700",
+                color: "#2563EB"
+              }}
+            >
+              {confidence_score}%
+            </div>
+          </div>
 
         </Card>
 
-        {/* Speech Analysis */}
+
+        {/* Speech */}
 
         <Card title="Speech Analysis">
 
@@ -125,11 +135,73 @@ export default function Dashboard({ analytics }) {
 
         </Card>
 
-      </div>
 
-      {/* Language Quality */}
+        {/* Emotion */}
 
-      <div style={{ marginTop: "20px" }}>
+        <Card title="Emotion Distribution">
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}
+          >
+
+            {/* PIE */}
+
+            <div style={{ width: "170px" }}>
+              <Pie
+                data={data}
+                options={{
+                  plugins: {
+                    legend: { display: false }
+                  }
+                }}
+              />
+            </div>
+
+
+            {/* LEGEND */}
+
+            <div style={{ fontSize: "14px" }}>
+              {labels.map((label, index) => (
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "6px"
+                  }}
+                >
+
+                  <span
+                    style={{
+                      width: "12px",
+                      height: "12px",
+                      backgroundColor:
+                        data.datasets[0].backgroundColor[index],
+                      borderRadius: "3px",
+                      marginRight: "8px"
+                    }}
+                  />
+
+                  <span style={{ marginRight: "6px", fontWeight: "500" }}>
+                    {label}
+                  </span>
+
+                  <span>{values[index]}%</span>
+
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+        </Card>
+
+
+        {/* Language */}
 
         <Card title="Language Quality">
 

@@ -93,3 +93,9 @@ async def final_analysis(data: dict):
     )
 
     return result
+
+
+@app.get("/test-connection")
+def test_connection():
+    print("Frontend connected successfully")
+    return {"message": "Backend working"}
